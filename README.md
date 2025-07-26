@@ -89,7 +89,9 @@ cortex:
  Running the Engine
 ```
 You need elevated privileges to capture network packets.
-`sudo ./protocol-argus-cortex --config config.yml`
+```sh
+sudo ./protocol-argus-cortex --config config.yml
+```
 
 ### Project Structure
 ```
