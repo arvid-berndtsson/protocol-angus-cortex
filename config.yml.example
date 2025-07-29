@@ -1,0 +1,44 @@
+# Protocol Argus Cortex Configuration
+# Copy this file to config.yml and modify as needed
+
+server:
+  # API server port
+  api_port: 8080
+  # Prometheus metrics port
+  metrics_port: 9090
+
+capture:
+  # Network interface to monitor (e.g., eth0, en0, wlan0)
+  interface: "eth0"
+  # BPF filter for packet capture (e.g., "tcp or udp port 443")
+  bpf_filter: "tcp or udp port 443"
+  # Capture buffer size in bytes
+  buffer_size: 1048576  # 1MB
+
+cortex:
+  # Path to the trained neural network model
+  model_path: "./models/bot_detection_v1.onnx"
+  # Minimum confidence score to trigger bot detection alert
+  detection_threshold: 0.85
+  # Batch size for model inference
+  batch_size: 32
+  # Inference timeout in milliseconds
+  inference_timeout: 1000
+
+# Logging configuration
+logging:
+  # Log level: debug, info, warn, error
+  level: "info"
+  # Log format: json, text
+  format: "text"
+  # Output: stdout, stderr, file
+  output: "stdout"
+
+# Feature extraction settings
+features:
+  # Maximum number of packets to analyze per flow
+  max_packets_per_flow: 1000
+  # Flow timeout in seconds
+  flow_timeout: 300
+  # Feature vector size (must match model input)
+  vector_size: 128 
