@@ -86,7 +86,7 @@ cortex:
   model_path: "./models/bot_detection_v1.onnx"
   # The minimum confidence score to trigger an alert
   detection_threshold: 0.85
-
+```
 ### Running the Engine
 You need elevated privileges to capture network packets.
 ```sh
