@@ -108,7 +108,7 @@ func main() {
 // generateBotFeatures creates features that simulate bot behavior
 func generateBotFeatures(featureSize int) []float64 {
 	features := make([]float64, featureSize)
-	
+
 	// Bot characteristics: regular timing, consistent patterns
 	for i := 0; i < featureSize; i++ {
 		switch {
@@ -128,14 +128,14 @@ func generateBotFeatures(featureSize int) []float64 {
 			features[i] = rand.Float64() * 0.5
 		}
 	}
-	
+
 	return features
 }
 
 // generateHumanFeatures creates features that simulate human behavior
 func generateHumanFeatures(featureSize int) []float64 {
 	features := make([]float64, featureSize)
-	
+
 	// Human characteristics: irregular timing, variable patterns
 	for i := 0; i < featureSize; i++ {
 		switch {
@@ -155,7 +155,7 @@ func generateHumanFeatures(featureSize int) []float64 {
 			features[i] = 0.3 + rand.Float64()*0.7
 		}
 	}
-	
+
 	return features
 }
 
@@ -171,7 +171,7 @@ func generateRandomFeatures(featureSize int) []float64 {
 // performBatchPrediction runs multiple predictions
 func performBatchPrediction(engine *ml.MLEngine, featureSize, count int) []*ml.DetectionResult {
 	results := make([]*ml.DetectionResult, count)
-	
+
 	for i := 0; i < count; i++ {
 		features := generateRandomFeatures(featureSize)
 		result, err := engine.Predict(context.Background(), features, fmt.Sprintf("batch_%03d", i+1))
@@ -181,7 +181,7 @@ func performBatchPrediction(engine *ml.MLEngine, featureSize, count int) []*ml.D
 		}
 		results[i] = result
 	}
-	
+
 	return results
 }
 
@@ -200,7 +200,7 @@ func printBatchResults(results []*ml.DetectionResult) {
 	botCount := 0
 	humanCount := 0
 	var totalConfidence float64
-	
+
 	for _, result := range results {
 		if result != nil {
 			if result.IsBot {
@@ -211,7 +211,7 @@ func printBatchResults(results []*ml.DetectionResult) {
 			totalConfidence += result.Confidence
 		}
 	}
-	
+
 	fmt.Printf("  📈 Batch Results Summary:\n")
 	fmt.Printf("    🤖 Bots detected: %d\n", botCount)
 	fmt.Printf("    👤 Humans detected: %d\n", humanCount)
@@ -252,4 +252,4 @@ func prettyPrintJSON(data interface{}) {
 		return
 	}
 	fmt.Println(string(jsonData))
-} 
+}

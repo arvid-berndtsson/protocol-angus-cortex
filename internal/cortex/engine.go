@@ -212,8 +212,14 @@ func (e *Engine) GetStatistics() *Statistics {
 	e.stats.mu.RLock()
 	defer e.stats.mu.RUnlock()
 
-	// Return a copy to avoid race conditions
-	stats := *e.stats
+	// Create a copy without the mutex to avoid copying lock value
+	stats := Statistics{
+		TotalInferences:   e.stats.TotalInferences,
+		BotDetections:     e.stats.BotDetections,
+		HumanDetections:   e.stats.HumanDetections,
+		AverageConfidence: e.stats.AverageConfidence,
+		LastInference:     e.stats.LastInference,
+	}
 	return &stats
 }
 

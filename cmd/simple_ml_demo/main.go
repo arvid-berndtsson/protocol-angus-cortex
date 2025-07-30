@@ -14,19 +14,19 @@ import (
 
 // SimpleMLDemo represents a simple ML demo without external dependencies
 type SimpleMLDemo struct {
-	config     config.MLConfig
-	stats      *DemoStatistics
-	mu         sync.RWMutex
+	config config.MLConfig
+	stats  *DemoStatistics
+	mu     sync.RWMutex
 }
 
 // DemoStatistics holds demo statistics
 type DemoStatistics struct {
-	TotalPredictions   int64     `json:"total_predictions"`
-	BotDetections      int64     `json:"bot_detections"`
-	HumanDetections    int64     `json:"human_detections"`
-	AverageConfidence  float64   `json:"average_confidence"`
-	LastPrediction     time.Time `json:"last_prediction"`
-	mu                 sync.RWMutex
+	TotalPredictions  int64     `json:"total_predictions"`
+	BotDetections     int64     `json:"bot_detections"`
+	HumanDetections   int64     `json:"human_detections"`
+	AverageConfidence float64   `json:"average_confidence"`
+	LastPrediction    time.Time `json:"last_prediction"`
+	mu                sync.RWMutex
 }
 
 // DetectionResult represents the result of bot detection
@@ -59,12 +59,12 @@ func NewSimpleMLDemo(config config.MLConfig) *SimpleMLDemo {
 func (d *SimpleMLDemo) Predict(ctx context.Context, features []float64, flowID string) (*DetectionResult, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	
+
 	// Simple heuristic-based prediction
 	confidence := d.simplePrediction(features)
 	isBot := confidence > d.config.DetectionThreshold
 	reasoning := d.generateReasoning(features, confidence)
-	
+
 	result := &DetectionResult{
 		IsBot:      isBot,
 		Confidence: confidence,
@@ -74,16 +74,16 @@ func (d *SimpleMLDemo) Predict(ctx context.Context, features []float64, flowID s
 		Timestamp:  time.Now(),
 		FlowID:     flowID,
 	}
-	
+
 	d.updateStats(result)
-	
+
 	return result, nil
 }
 
 // simplePrediction provides a simple heuristic-based prediction
 func (d *SimpleMLDemo) simplePrediction(features []float64) float64 {
 	var score float64
-	
+
 	// Analyze feature patterns that might indicate bot behavior
 	for i, feature := range features {
 		// Higher values in certain ranges might indicate bot behavior
@@ -103,7 +103,7 @@ func (d *SimpleMLDemo) simplePrediction(features []float64) float64 {
 			score += 0.1
 		}
 	}
-	
+
 	// Normalize to [0, 1]
 	score = math.Min(score, 1.0)
 	return score
@@ -112,7 +112,7 @@ func (d *SimpleMLDemo) simplePrediction(features []float64) float64 {
 // generateReasoning provides human-readable explanation for the prediction
 func (d *SimpleMLDemo) generateReasoning(features []float64, confidence float64) string {
 	var reasoning string
-	
+
 	if confidence > 0.8 {
 		reasoning = "High confidence bot detection based on "
 	} else if confidence > 0.6 {
@@ -122,15 +122,15 @@ func (d *SimpleMLDemo) generateReasoning(features []float64, confidence float64)
 	} else {
 		reasoning = "Human-like behavior detected based on "
 	}
-	
+
 	reasoning += "simple heuristic analysis. "
-	
+
 	// Add specific feature insights
 	if len(features) > 0 {
 		reasoning += "Key indicators include packet timing patterns, "
 		reasoning += "protocol behavior consistency, and flow characteristics."
 	}
-	
+
 	return reasoning
 }
 
@@ -138,18 +138,18 @@ func (d *SimpleMLDemo) generateReasoning(features []float64, confidence float64)
 func (d *SimpleMLDemo) updateStats(result *DetectionResult) {
 	d.stats.mu.Lock()
 	defer d.stats.mu.Unlock()
-	
+
 	d.stats.TotalPredictions++
 	if result.IsBot {
 		d.stats.BotDetections++
 	} else {
 		d.stats.HumanDetections++
 	}
-	
+
 	// Update average confidence
 	total := float64(d.stats.TotalPredictions)
 	d.stats.AverageConfidence = (d.stats.AverageConfidence*(total-1) + result.Confidence) / total
-	
+
 	d.stats.LastPrediction = result.Timestamp
 }
 
@@ -157,8 +157,15 @@ func (d *SimpleMLDemo) updateStats(result *DetectionResult) {
 func (d *SimpleMLDemo) GetStatistics() *DemoStatistics {
 	d.stats.mu.RLock()
 	defer d.stats.mu.RUnlock()
-	
-	stats := *d.stats // Copy to avoid race conditions
+
+	// Create a copy without the mutex to avoid copying lock value
+	stats := DemoStatistics{
+		TotalPredictions:  d.stats.TotalPredictions,
+		BotDetections:     d.stats.BotDetections,
+		HumanDetections:   d.stats.HumanDetections,
+		AverageConfidence: d.stats.AverageConfidence,
+		LastPrediction:    d.stats.LastPrediction,
+	}
 	return &stats
 }
 
@@ -246,7 +253,7 @@ func main() {
 // generateBotFeatures creates features that simulate bot behavior
 func generateBotFeatures(featureSize int) []float64 {
 	features := make([]float64, featureSize)
-	
+
 	// Bot characteristics: regular timing, consistent patterns
 	for i := 0; i < featureSize; i++ {
 		switch {
@@ -266,14 +273,14 @@ func generateBotFeatures(featureSize int) []float64 {
 			features[i] = rand.Float64() * 0.5
 		}
 	}
-	
+
 	return features
 }
 
 // generateHumanFeatures creates features that simulate human behavior
 func generateHumanFeatures(featureSize int) []float64 {
 	features := make([]float64, featureSize)
-	
+
 	// Human characteristics: irregular timing, variable patterns
 	for i := 0; i < featureSize; i++ {
 		switch {
@@ -293,7 +300,7 @@ func generateHumanFeatures(featureSize int) []float64 {
 			features[i] = 0.3 + rand.Float64()*0.7
 		}
 	}
-	
+
 	return features
 }
 
@@ -309,7 +316,7 @@ func generateRandomFeatures(featureSize int) []float64 {
 // performBatchPrediction runs multiple predictions
 func performBatchPrediction(demo *SimpleMLDemo, featureSize, count int) []*DetectionResult {
 	results := make([]*DetectionResult, count)
-	
+
 	for i := 0; i < count; i++ {
 		features := generateRandomFeatures(featureSize)
 		result, err := demo.Predict(context.Background(), features, fmt.Sprintf("batch_%03d", i+1))
@@ -319,7 +326,7 @@ func performBatchPrediction(demo *SimpleMLDemo, featureSize, count int) []*Detec
 		}
 		results[i] = result
 	}
-	
+
 	return results
 }
 
@@ -338,7 +345,7 @@ func printBatchResults(results []*DetectionResult) {
 	botCount := 0
 	humanCount := 0
 	var totalConfidence float64
-	
+
 	for _, result := range results {
 		if result != nil {
 			if result.IsBot {
@@ -349,7 +356,7 @@ func printBatchResults(results []*DetectionResult) {
 			totalConfidence += result.Confidence
 		}
 	}
-	
+
 	fmt.Printf("  📈 Batch Results Summary:\n")
 	fmt.Printf("    🤖 Bots detected: %d\n", botCount)
 	fmt.Printf("    👤 Humans detected: %d\n", humanCount)
@@ -378,4 +385,4 @@ func printModelInfo(config config.MLConfig) {
 	fmt.Printf("  💾 Model Path: %s\n", config.ModelPath)
 	fmt.Printf("  🖥️  Enable GPU: %t\n", config.EnableGPU)
 	fmt.Printf("  🔧 Max Concurrency: %d\n", config.MaxConcurrency)
-} 
+}

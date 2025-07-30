@@ -215,13 +215,14 @@ func (e *MLEngine) TrainOnFakeData() error {
 	features, labels := e.dataGen.GenerateFakeData(e.config.FakeDataSize, e.config.FeatureSize)
 
 	// Train models based on type
+	var err error
 	switch e.config.ModelType {
 	case "neural_network":
-		return e.trainNeuralNetwork(features, labels)
+		err = e.trainNeuralNetwork(features, labels)
 	case "svm":
-		return e.trainSVM(features, labels)
+		err = e.trainSVM(features, labels)
 	case "ensemble":
-		return e.trainEnsemble(features, labels)
+		err = e.trainEnsemble(features, labels)
 	default:
 		return fmt.Errorf("unsupported model type for training: %s", e.config.ModelType)
 	}
@@ -231,7 +232,7 @@ func (e *MLEngine) TrainOnFakeData() error {
 	e.stats.mu.Unlock()
 
 	slog.Info("Training completed", "duration", time.Since(startTime))
-	return nil
+	return err
 }
 
 // Predict performs bot detection using the trained model
@@ -433,7 +434,16 @@ func (e *MLEngine) GetStatistics() *MLStatistics {
 	e.stats.mu.RLock()
 	defer e.stats.mu.RUnlock()
 
-	stats := *e.stats // Copy to avoid race conditions
+	// Create a copy without the mutex to avoid copying lock value
+	stats := MLStatistics{
+		TotalPredictions:  e.stats.TotalPredictions,
+		BotDetections:     e.stats.BotDetections,
+		HumanDetections:   e.stats.HumanDetections,
+		AverageConfidence: e.stats.AverageConfidence,
+		ModelAccuracy:     e.stats.ModelAccuracy,
+		TrainingTime:      e.stats.TrainingTime,
+		LastPrediction:    e.stats.LastPrediction,
+	}
 	return &stats
 }
 

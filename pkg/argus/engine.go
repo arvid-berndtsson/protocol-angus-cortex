@@ -346,7 +346,13 @@ func (e *Engine) GetStatistics() *CaptureStats {
 	e.stats.mu.RLock()
 	defer e.stats.mu.RUnlock()
 
-	stats := *e.stats
+	// Create a copy without the mutex to avoid copying lock value
+	stats := CaptureStats{
+		TotalPackets:  e.stats.TotalPackets,
+		ActiveFlows:   e.stats.ActiveFlows,
+		AnalyzedFlows: e.stats.AnalyzedFlows,
+		LastPacket:    e.stats.LastPacket,
+	}
 	return &stats
 }
 
