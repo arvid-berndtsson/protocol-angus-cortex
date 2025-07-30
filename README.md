@@ -25,7 +25,7 @@ This project focuses on the *behavioral fingerprint* of a connection—how it co
 *   **Metrics & API**: Exposes Prometheus metrics and a simple REST API for querying detection statistics.
 
 ## Architecture
-
+```
                                  +-----------------------+
                               |   Cortex Engine       |
                               | (NN Model Inference)  |
@@ -37,7 +37,7 @@ This project focuses on the *behavioral fingerprint* of a connection—how it co
 | Traffic (NIC)  |      | (Packet Capture & |   | (API / Prometheus /  |
 +----------------+      | Feature Extractor)|   |  Logging)            |
 +-------------------+   +----------------------+
- 
+```
 ## Getting Started
 
 ### Prerequisites
