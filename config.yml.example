@@ -25,6 +25,31 @@ cortex:
   # Inference timeout in milliseconds
   inference_timeout: 1000
 
+# Machine Learning Configuration
+ml:
+  # Model type: neural_network, random_forest, knn, svm, ensemble
+  model_type: "ensemble"
+  # Detection threshold for bot classification
+  detection_threshold: 0.6
+  # Training parameters
+  batch_size: 32
+  training_epochs: 100
+  learning_rate: 0.001
+  feature_size: 128
+  # Data generation settings
+  generate_fake_data: true
+  fake_data_size: 1000
+  # Model persistence
+  model_path: "./models/bot_detection_model"
+  save_model: true
+  load_model: false
+  # Performance settings
+  enable_gpu: false
+  max_concurrency: 4
+  # Monitoring
+  enable_metrics: true
+  log_predictions: false
+
 # Logging configuration
 logging:
   # Log level: debug, info, warn, error
