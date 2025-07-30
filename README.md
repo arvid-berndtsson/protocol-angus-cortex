@@ -92,7 +92,7 @@ You need elevated privileges to capture network packets.
 `sudo ./protocol-argus-cortex --config config.yml`
 
 ### Project Structure
-.
+```
 ├── cmd/protocol-argus-cortex/
 │   └── main.go               # Main application entry point
 ├── internal/
@@ -108,6 +108,6 @@ You need elevated privileges to capture network packets.
 ├── go.mod
 ├── go.sum
 └── README.md
-
+```
 ### Contribution
 Contributions are welcome! Please open an issue to discuss your ideas or submit a pull request. Ensure your code is formatted with ⁠go fmt before submitting.
